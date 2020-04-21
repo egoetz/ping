@@ -17,7 +17,10 @@ def main(argv):
             print('test.py -n <host name> -i <ip address> -p <port number> -t <time interval> -w <wait period>')
             sys.exit()
         if opt == '-n':
-            _, _, _, _, addr = socket.getaddrinfo(addr, 0)
+            # Want to get the ip address from the hostname
+            _, _, _, _, addr = socket.getaddrinfo(arg, 0)[0]
+            # addr is a (host, port) tuple and we don't need the port for ICMP
+            addr = addr[0]
         if opt == '-i':
             if isinstance(arg, str) and arg.count('.') == 3:
                 byte_list = arg.split('.')
@@ -57,14 +60,8 @@ def main(argv):
             else:
                 raise ValueError('You specified an invalid time interval. You must choose an float.')
 
-    # Eventually this socket will be created by the Ping class
-    current_socket = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.getprotobyname("icmp"))
-    current_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-
-    my_ping = Ping(addr)
-    # Eventually this will be encompassed in a different function
-    # Currently this results in an error during the internet_checksum function
-    my_ping.send(current_socket)
+    my_ping = Ping(addr, id = 1)
+    my_ping.run()
 
 
 
