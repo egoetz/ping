@@ -1,5 +1,5 @@
 import sys, getopt, socket
-
+from ping import Ping
 
 def main(argv):
     try:
@@ -11,17 +11,17 @@ def main(argv):
     if opt_specified.count('-n') + opt_specified.count('-i') != 1:
         raise ValueError(
             'You specified more than one hostname, more than one IP address or a combination of hostnames and IP '
-            'addresses. You specify one argument for -h or one argument for -i.')
+            'addresses. You specify one argument for -n or one argument for -i.')
     for opt, arg in opts:
         if opt == '-h':
             print('test.py -n <host name> -i <ip address> -p <port number> -t <time interval> -w <wait period>')
             sys.exit()
         if opt == '-n':
-            addr = arg
+            _, _, _, _, addr = socket.getaddrinfo(addr, 0)
         if opt == '-i':
             if isinstance(arg, str) and arg.count('.') == 3:
-                bytes = arg.split('.')
-                for byte in bytes:
+                byte_list = arg.split('.')
+                for byte in byte_list:
                     byte = int(byte)
                     if not (byte >= 0 and byte <= 255):
                         raise ValueError(
@@ -57,15 +57,16 @@ def main(argv):
             else:
                 raise ValueError('You specified an invalid time interval. You must choose an float.')
 
-    if 'port' in locals():
-        addrInfo = socket.getaddrinfo(addr, port, family=0, type=0, proto=0, flags=0)
-    else:
-        addrInfo = socket.getaddrinfo(addr, None, family=0, type=0, proto=0, flags=0)
-    for possible_connection in addrInfo:
-        print(possible_connection)
-        print(len(possible_connection))
-        my_socket = socket.socket(*possible_connection)
-        my_socket.close()
+    # Eventually this socket will be created by the Ping class
+    current_socket = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.getprotobyname("icmp"))
+    current_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+
+    my_ping = Ping(addr)
+    # Eventually this will be encompassed in a different function
+    # Currently this results in an error during the internet_checksum function
+    my_ping.send(current_socket)
+
+
 
 # Options of potential use:
 # Timing
