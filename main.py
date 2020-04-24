@@ -8,6 +8,8 @@ def main(argv):
         print('test.py -n <host name> -i <ip address> -p <port number> -t <time interval> -w <wait period>')
         sys.exit(2)
     opt_specified = [opt for opt, arg in opts]
+    time_interval_used = False
+    wait_period_used = False
     if opt_specified.count('-n') + opt_specified.count('-i') != 1:
         raise ValueError(
             'You specified more than one hostname, more than one IP address or a combination of hostnames and IP '
@@ -49,18 +51,26 @@ def main(argv):
             else:
                 raise ValueError('You specified an invalid port number. You must choose an integer in [0, 65535].')
                 sys.exit()
-        if opt == 't':
-            if isinstance(arg, float):
-                time_interval = arg
+        if opt == '-t':
+            if isinstance(float(arg), float):
+                time_interval = float(arg)
+                time_interval_used = True
             else:
                 raise ValueError('You specified an invalid time interval. You must choose an float.')
-        if opt == 'w':
-            if isinstance(arg, float):
-                wait_period = arg
+        if opt == '-w':
+            if isinstance(float(arg), float):
+                wait_period = float(arg)
+                wait_period_used = True
             else:
                 raise ValueError('You specified an invalid time interval. You must choose an float.')
 
-    my_ping = Ping(addr, id = 1)
+
+    if time_interval_used:
+        my_ping = Ping(addr, timeout=time_interval, id=1)
+    elif wait_period_used:
+        my_ping = Ping(addr, timeout=wait_period, id=1)
+    else:
+        my_ping = Ping(addr, id = 1)
     my_ping.run()
 
 
