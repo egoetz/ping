@@ -52,7 +52,7 @@ class Ping():
         self.id = id
         self.sequence_number = 0
         self.sent = 0
-        self.recieved = 0
+        self.received = 0
         self.min_time = math.inf
         self.max_time = 0
         self.total_time = 0
@@ -61,27 +61,46 @@ class Ping():
             self.id = os.getpid() & 0xFFFF
 
 
-    def run(self, max_count = 3, timeout=10000000):
+    def run(self, max_count = 3):
         """
         Continually sends and receives ping messages until count or timeout is reached
 
         Args:
             max_count: integer - maximum number of pings to send
-            timeout: integer - maximum time to wait for responses
         Returns:
             Does not return, prints message to console
         """
         start_time = timer()
         count = 0
-        while count < max_count and timer() - start_time < timeout:
+        while count < max_count and timer() - start_time < self.timeout:
             ping_socket = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.getprotobyname("icmp"))
             ping_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
             ping_sent = self.send(ping_socket)
-            self.receive(ping_socket, self.id, timeout)
+            self.sent += 1
 
+            ping_received = self.receive(ping_socket, self.id, self.timeout)
+            if ping_received is not None:
+                self.received += 1
+                round_trip_time = ping_received - ping_sent
+                if round_trip_time > self.max_time:
+                    self.max_time = round_trip_time
+                if round_trip_time < self.min_time:
+                    self.min_time = round_trip_time
+            else:
+                print("Failed to receive ping")
             count += 1
         if count < max_count:
             print("Process timed out")
+        else:
+            self.total_time = timer() - start_time
+            print("Pings Sent:\t{}".format(self.sent))
+            print("Ping Received:\t{}".format(self.received))
+            print("Pings Dropped:\t{}".format(self.sent - self.received))
+            print("Maximum Time:\t{}".format(self.max_time))
+            print("Minimum Time:\t{}".format(self.min_time))
+            print("Average Time:\t{}".format(self.total_time / self.received))
+
+
 
 
     def send(self, sock):
@@ -142,23 +161,16 @@ class Ping():
                 return # Timed out
 
             received_time = timer()
-            #print("Receive attempt: {}".format(receive_attempt))
             packet, addr = sock.recvfrom(ICMP_MAX_RECV)
-            #print("Packet: {}\tAddress: {}".format(packet, addr))
             header = packet[20:28]
             type, code, checksum, packet_id, sequence_number = struct.unpack(
                 "!BBHHH", header
             )
 
             if type != ICMP_ECHO_REQUEST and packet_id == id:
-                double = struct.calcsize("d")
-                send_time = struct.unpack("d", packet[28:28 + double])[0]
-                print("It took {} seconds to get a response".format(received_time - send_time))
-                return
-            print("Type: {}".format(type))
-            print("Id: {}\tExpected id: {}".format(packet_id, id))
-            print("Failed to receive")
-            return
+                return received_time
+
+            return None
 
 
 
