@@ -26,6 +26,7 @@ def main(argv):
     opt_specified = [opt for opt, arg in opts]
     time_interval_used = False
     wait_period_used = False
+    port_requested = False
     if opt_specified.count('-h') != 0:
         print('test.py -n <host name> -i <ip address> -p <port number> -t <time interval> -w <wait period>')
         sys.exit(0)
@@ -65,6 +66,7 @@ def main(argv):
                 sys.stderr.write('You specified an invalid IP address. You must use either IPV4 or IPV6 format.\n')
                 sys.exit(5)
         if opt == '-p':
+            port_requested = True
             if arg.isdigit() and (int(arg) >= 0  and int(arg) <= 65535):
                 port = arg
             else:
@@ -91,6 +93,24 @@ def main(argv):
         my_ping = Ping(addr, timeout=wait_period, id=1)
     else:
         my_ping = Ping(addr, id = 1)
+    if port_requested:
+        port_open = False
+        port_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        port_socket.settimeout(3)
+        try:
+            port_socket.connect((addr, int(port)))
+            port_socket.shutdown(socket.SHUT_RDWR)
+            port_open = True
+        except:
+            pass
+        finally:
+            port_socket.close()
+
+        if port_open:
+            print("Port number {} at {} is OPEN".format(port, addr))
+        else:
+            print("Port number {} at {} is CLOSED".format(port, addr))
+
     my_ping.run()
     # Options of potential use:
     # Timing
@@ -110,4 +130,3 @@ def main(argv):
 
 if __name__ == "__main__":
     main(sys.argv[1:])
-
