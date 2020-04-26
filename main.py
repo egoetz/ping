@@ -46,14 +46,14 @@ def main(argv):
     try:
         opts, args = getopt.getopt(argv, "hn:i:p:t:w:", ["host_name=", "ip_address=", "port=", "time_interval", "wait_period"])
     except getopt.GetoptError:
-        sys.stderr.write('test.py -n <host name> -i <ip address> -p <port number> -t <time interval> -w <wait period>\n')
+        sys.stderr.write('python3 main.py -n <host name> -i <ip address> -p <port number> -t <time interval> -w <wait period>\n')
         sys.exit(1)
     opt_specified = [opt for opt, arg in opts]
     time_interval_used = False
     wait_period_used = False
     port_requested = False
     if opt_specified.count('-h') != 0:
-        print('test.py -n <host name> -i <ip address> -p <port number> -t <time interval> -w <wait period>')
+        print('python3 main.py -n <host name> -i <ip address> -p <port number> -t <time interval> -w <wait period>')
         sys.exit(0)
     elif opt_specified.count('-n') + opt_specified.count('-i') != 1:
         sys.stderr.write(
