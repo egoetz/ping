@@ -1,7 +1,7 @@
 """
 CS330 Final Project
 
-Erika Geotz, Aedan Pettit
+E Goetz, Aedan Pettit
 
 Pinging with Python
 ----------------------------
@@ -20,6 +20,10 @@ program attempts to connect a socket to that particular port. If the connection
 is successful then the port is open, if it is not then the port is closed. Even
 if the port is closed ICMP packets can be sent and received because ICMP does
 not use ports. 
+----------------------------
+See Goetz for CLI structure and socket set up
+See Pettit for Ping class and port checking
+----------------------------
 """
 
 
@@ -137,21 +141,6 @@ def main(argv):
             print("Port number {} at {} is CLOSED".format(port, addr))
 
     my_ping.run()
-    # Options of potential use:
-    # Timing
-    # SIOCGSTAMP - Return a struct timeval with the receive timestamp of the last packet passed to the user.
-    # SO_TIMESTAMP - cmsg_data field is a struct timeval indicating the reception time of the last packet passed to the user in this call.
-    # Info on IP Address capabilities
-    # SO_PEERCRED - Return the credentials of the foreign process connected to this socket.
-    # SO_ACCEPTCONN - Returns a value indicating whether or not this socket has been marked to accept connections with listen(2)
-    # Change sending method:
-    # SO_MARK - Set the mark for each packet sent through this socket (similar to the netfilter MARK target but socket-based). Changing the mark can be used for mark-based routing without netfilter or for packet filtering.
-    # SO_KEEPALIVE -     Enable sending of keep-alive messages on connection-oriented sockets. Expects an integer boolean flag.
-    # SO_DONTROUTE - Don't send via a gateway, send only to directly connected hosts.
-    # SO_DEBUG - enable socket debug
-    # SO_BSDCOMPAT - Enable BSD bug-to-bug compatibility. If enabled, ICMP errors received for a UDP socket will not be passed to the user program.
-    # SO_BROADCAST - Set or get the broadcast flag. When enabled, datagram sockets are allowed to send packets to a broadcast address.
-
 
 if __name__ == "__main__":
     main(sys.argv[1:])
