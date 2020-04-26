@@ -1,3 +1,28 @@
+"""
+CS330 Final Project
+
+Erika Geotz, Aedan Pettit
+
+Pinging with Python
+----------------------------
+This project is a command line tool that implements a Ping-like program
+using python. The user may provide the program with a host name or ip address
+as well as a port number, time interval or wait period.
+
+The program will then send an ICMP Echo Request packet to the given address
+and wait for a response. If a response is received before the program times out
+then another packet will be sent. Ultimately, three packets are sent, and the
+program displays the average, maximum, and minimum round trip times among
+the packets sent as well as the number of packets sent, received, and dropped.
+
+If port number is specified, then before initiating the ICMP protocol, the
+program attempts to connect a socket to that particular port. If the connection
+is successful then the port is open, if it is not then the port is closed. Even
+if the port is closed ICMP packets can be sent and received because ICMP does
+not use ports. 
+"""
+
+
 import sys, getopt, socket
 from ping import Ping
 
