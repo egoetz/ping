@@ -24,6 +24,7 @@ not use ports.
 See Goetz for CLI structure and socket set up
 See Pettit for Ping class and port checking
 ----------------------------
+Acknowledgements to kyan001. "kyan001/ping3." GitHub, 11 Apr. 2020, github.com/kyan001/ping3. 
 """
 
 
