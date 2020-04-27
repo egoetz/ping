@@ -1,7 +1,7 @@
 """
 CS330 Final Project
 
-Erika Geotz, Aedan Pettit
+E Goetz, Aedan Pettit
 
 Pinging with Python
 ----------------------------
@@ -20,6 +20,11 @@ program attempts to connect a socket to that particular port. If the connection
 is successful then the port is open, if it is not then the port is closed. Even
 if the port is closed ICMP packets can be sent and received because ICMP does
 not use ports. 
+----------------------------
+See Goetz for CLI structure and socket set up
+See Pettit for Ping class and port checking
+----------------------------
+Acknowledgements to kyan001. "kyan001/ping3." GitHub, 11 Apr. 2020, github.com/kyan001/ping3. 
 """
 
 
@@ -46,14 +51,14 @@ def main(argv):
     try:
         opts, args = getopt.getopt(argv, "hn:i:p:t:w:", ["host_name=", "ip_address=", "port=", "time_interval", "wait_period"])
     except getopt.GetoptError:
-        sys.stderr.write('test.py -n <host name> -i <ip address> -p <port number> -t <time interval> -w <wait period>\n')
+        sys.stderr.write('python3 main.py -n <host name> -i <ip address> -p <port number> -t <time interval> -w <wait period>\n')
         sys.exit(1)
     opt_specified = [opt for opt, arg in opts]
     time_interval_used = False
     wait_period_used = False
     port_requested = False
     if opt_specified.count('-h') != 0:
-        print('test.py -n <host name> -i <ip address> -p <port number> -t <time interval> -w <wait period>')
+        print('python3 main.py -n <host name> -i <ip address> -p <port number> -t <time interval> -w <wait period>')
         sys.exit(0)
     elif opt_specified.count('-n') + opt_specified.count('-i') != 1:
         sys.stderr.write(
@@ -137,21 +142,6 @@ def main(argv):
             print("Port number {} at {} is CLOSED".format(port, addr))
 
     my_ping.run()
-    # Options of potential use:
-    # Timing
-    # SIOCGSTAMP - Return a struct timeval with the receive timestamp of the last packet passed to the user.
-    # SO_TIMESTAMP - cmsg_data field is a struct timeval indicating the reception time of the last packet passed to the user in this call.
-    # Info on IP Address capabilities
-    # SO_PEERCRED - Return the credentials of the foreign process connected to this socket.
-    # SO_ACCEPTCONN - Returns a value indicating whether or not this socket has been marked to accept connections with listen(2)
-    # Change sending method:
-    # SO_MARK - Set the mark for each packet sent through this socket (similar to the netfilter MARK target but socket-based). Changing the mark can be used for mark-based routing without netfilter or for packet filtering.
-    # SO_KEEPALIVE -     Enable sending of keep-alive messages on connection-oriented sockets. Expects an integer boolean flag.
-    # SO_DONTROUTE - Don't send via a gateway, send only to directly connected hosts.
-    # SO_DEBUG - enable socket debug
-    # SO_BSDCOMPAT - Enable BSD bug-to-bug compatibility. If enabled, ICMP errors received for a UDP socket will not be passed to the user program.
-    # SO_BROADCAST - Set or get the broadcast flag. When enabled, datagram sockets are allowed to send packets to a broadcast address.
-
 
 if __name__ == "__main__":
     main(sys.argv[1:])
