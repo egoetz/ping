@@ -3,6 +3,7 @@ import os
 import select
 import socket
 import struct
+import time
 from timeit import default_timer as timer
 
 # From RFC792
@@ -51,16 +52,18 @@ class Ping:
     This class handles information related to the ping request
     It stores the destination of the ping as well as other relevant information
     """
-    def __init__(self, destination, timeout=1000, packet_size=55, id=None):
+    def __init__(self, destination, timeout=100, time_between = 0, packet_size=55, id=None):
         """
         Initialize Ping class and assign members' starting values.
         :param destination: The location being pinged.
         :param timeout: The time to wait for a response from the destination before returning.
+        :param time_between: Amount of time to wait between ping messages (if desired)
         :param packet_size: The size of the packet being sent.
         :param id: The ID number of the Ping instance.
         """
         self.destination = destination
         self.timeout = timeout
+        self.time_between = time_between
         self.packet_size = packet_size
         self.id = id
         self.sequence_number = 0
@@ -80,6 +83,7 @@ class Ping:
         :return: None.
         """
         start_time = timer()
+        print(start_time)
         count = 0
         while count < max_count and timer() - start_time < self.timeout:
             ping_socket = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.getprotobyname("icmp"))
@@ -98,10 +102,14 @@ class Ping:
             else:
                 print("Failed to receive ping")
             count += 1
+            if self.time_between != 0:
+                self.total_time += round_trip_time
+                time.sleep(self.time_between)
         if count < max_count:
             print("Process timed out")
         else:
-            self.total_time = timer() - start_time
+            if self.time_between == 0:
+                self.total_time = timer() - start_time
             print("Pings Sent:\t{}".format(self.sent))
             print("Ping Received:\t{}".format(self.received))
             print("Pings Dropped:\t{}".format(self.sent - self.received))

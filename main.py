@@ -19,12 +19,12 @@ If port number is specified, then before initiating the ICMP protocol, the
 program attempts to connect a socket to that particular port. If the connection
 is successful then the port is open, if it is not then the port is closed. Even
 if the port is closed ICMP packets can be sent and received because ICMP does
-not use ports. 
+not use ports.
 ----------------------------
 See Goetz for CLI structure and socket set up
 See Pettit for Ping class and port checking
 ----------------------------
-Acknowledgements to kyan001. "kyan001/ping3." GitHub, 11 Apr. 2020, github.com/kyan001/ping3. 
+Acknowledgements to kyan001. "kyan001/ping3." GitHub, 11 Apr. 2020, github.com/kyan001/ping3.
 """
 
 
@@ -117,10 +117,12 @@ def main(argv):
                 sys.stderr.write('You specified an invalid time interval. You must choose an float.\n')
                 sys.exit(8)
 
-    if time_interval_used:
-        my_ping = Ping(addr, timeout=time_interval, id=1)
+    if time_interval_used and wait_period_used:
+        my_ping = Ping(addr, timeout=wait_period, time_between=time_interval, id=1)
     elif wait_period_used:
         my_ping = Ping(addr, timeout=wait_period, id=1)
+    elif time_interval_used:
+        my_ping = Ping(addr, time_between=time_interval, id=1)
     else:
         my_ping = Ping(addr, id = 1)
     if port_requested:
